@@ -1,0 +1,181 @@
+1)SQL-скрипт с тестовым набором данных
+
+
+mysql> with recursive series as (
+    -> select 1 as id union all
+    -> select id + 1 as id
+    ->    from series
+    ->    where id < 100), 
+    ->    city as (select 'Santa Clara' city union all 
+    ->               select 'Los Angeles' union all 
+    ->               select 'Santa Clarita' union all 
+    ->               select 'San Bernardino' union all
+    ->               select 'Alameda' union all
+    ->               select 'San Mateo' union all 
+    ->               select 'Santa Barbara'              
+    ->              ),
+    ->    first_names as (select 'John' first_name union all
+    ->    select 'James' first_name union all
+    ->    select 'David' first_name union all
+    ->    select 'Jeremy' first_name union all
+    ->    select 'Ron' first_name union all
+    ->    select 'Katie' first_name union all
+    ->    select 'Nikita' first_name union all
+    ->    select 'Rachel' first_name union all
+    ->            select 'Tom' first_name
+    ->    ),
+    ->     last_names as (select 'Smith' last_name union all
+    ->        select 'Johnson' last_name union all
+    ->           select 'Williams' last_name union all
+    ->           select 'Brown' last_name union all
+    ->           select 'Jones' last_name union all
+    ->                   select 'Miller' last_name union all
+    ->           select 'Davis' last_name union all
+    ->           select 'Wilson' last_name union all
+    ->          select 'West' last_name
+    ->    )
+    -> select id, user_id, first_name, last_name
+    ->        dob, city, salary - mod(salary, 100) salary
+    -> from (select id, 
+    ->        substring(md5(rand()),1,20) user_id,
+    ->        (select first_name from first_names order by rand() limit 1) first_name,
+    ->        (select last_name from last_names order by rand() limit 1) last_name,
+    ->        date(concat_ws('-',(floor(1919+rand()*100)),
+    ->                           (floor(1+rand()*12)),
+    ->                           (floor(1+rand()*28))
+    ->                      )
+    ->            ) dob,
+    ->        (select city from cities order by rand() limit 1) city,
+    ->        floor((rand() * (120000 + 1)) + 35000) salary
+    -> from series) as t;
++------+----------------------+------------+----------+----------------+--------+
+| id   | user_id              | first_name | dob      | city           | salary |
++------+----------------------+------------+----------+----------------+--------+
+|    1 | 02a7eede5d0ff78d8523 | Katie      | Williams | San Mateo      |  95900 |
+|    2 | b6e9613317fc64e562a4 | James      | West     | Santa Barbara  | 120100 |
+|    3 | 2485f90d313320763a92 | Tom        | West     | Santa Clarita  | 105200 |
+|    4 | aefcb564b44ac4f52ed4 | Nikita     | Miller   | San Mateo      | 105900 |
+|    5 | d1f47626c7b3afb6dc8a | Ron        | Smith    | Alameda        | 151300 |
+|    6 | bed6301e2aa2018d60de | Jeremy     | Jones    | Santa Clarita  | 122400 |
+|    7 | 4cb2b1a29c6736f9f09c | John       | Smith    | Santa Clarita  |  94200 |
+|    8 | b6855ddc49cd81300c8f | Ron        | West     | Santa Barbara  |  50000 |
+|    9 | 50f2be60eca38caf935a | Jeremy     | Jones    | Santa Clara    |  67900 |
+|   10 | 1c788683b0c40d65f3a2 | Jeremy     | West     | Santa Clarita  |  82800 |
+|   11 | 8cf7fab9442d57bcddb3 | Nikita     | Williams | Los Angeles    | 153700 |
+|   12 | 12840774bb39329cacc4 | Jeremy     | Brown    | Santa Clarita  | 119600 |
+|   13 | 186d9b5379165a31c244 | Nikita     | Johnson  | San Mateo      |  38600 |
+|   14 | 9ad03045a22ec4c0edeb | John       | West     | San Mateo      | 129500 |
+|   15 | 6e0b9fa41fe8fbcdcacc | Nikita     | Williams | Santa Barbara  |  66700 |
+|   16 | f0ff51711d868fa71a15 | John       | Davis    | Santa Clara    | 128000 |
+|   17 | f4c43aecf1f27859dc73 | Jeremy     | Wilson   | Santa Barbara  | 146200 |
+|   18 | 971e13e94afd100c2319 | Tom        | Smith    | Santa Barbara  | 142500 |
+|   19 | 247e9a334e80d81d9201 | Nikita     | West     | Alameda        | 133800 |
+|   20 | 3e87e4c2822dbd596d9a | David      | Wilson   | Alameda        | 115300 |
+|   21 | e089f0868b02dffbb22c | John       | Williams | Alameda        | 126100 |
+|   22 | a75d4db241bd92c4c60b | Katie      | Davis    | San Mateo      |  85400 |
+|   23 | 0d3fdca3be4bb45acb3c | Rachel     | Wilson   | Los Angeles    |  57800 |
+|   24 | f232dc4d442fe39fe740 | James      | West     | Los Angeles    |  53900 |
+|   25 | b35b8c9413c493ae7a87 | Katie      | Johnson  | San Mateo      | 110100 |
+|   26 | 079c5353fab666876f6f | John       | Wilson   | Los Angeles    | 130900 |
+|   27 | ae3ee89f2d8e26c794e8 | Rachel     | Smith    | San Mateo      |  81300 |
+|   28 | 82b99949db895c60e81b | Ron        | Williams | Santa Clarita  | 125400 |
+|   29 | ce395c53af10c7131a68 | Tom        | Davis    | Alameda        | 107700 |
+|   30 | 193040a0a4df79e10afb | Nikita     | Johnson  | Santa Clarita  |  66500 |
+|   31 | 97739df57ee9ac139a29 | Katie      | Miller   | Santa Clara    | 116700 |
+|   32 | f6c9af4bc2407301a97a | David      | Williams | Santa Clara    |  50900 |
+|   33 | ba4a04f405b0041c9a8a | Jeremy     | Brown    | Los Angeles    |  77400 |
+|   34 | bb6758c75ab635cea067 | David      | Johnson  | Santa Barbara  | 145500 |
+|   35 | db4876ee0b8320f6f0eb | Katie      | Davis    | Santa Barbara  |  61800 |
+|   36 | b8ad975d2895f6b01ff6 | Nikita     | Johnson  | Santa Clara    |  78300 |
+|   37 | d57a2d2fcf66225d3713 | Katie      | Davis    | San Bernardino |  56600 |
+|   38 | d40604ac18f15d40101d | David      | West     | Santa Clara    |  78500 |
+|   39 | f5e1a1adcc0e38ebe879 | John       | Davis    | Santa Clara    |  76700 |
+|   40 | c63c4acedf8985ce62e6 | Rachel     | Johnson  | Santa Clara    | 119700 |
+|   41 | 27084a145d589c8e723b | Katie      | West     | Santa Clara    |  98100 |
+|   42 | 033aa9df7f44e262b3c3 | David      | Smith    | Santa Clarita  | 126700 |
+|   43 | 55e98bdfb1e7e4522c66 | James      | Smith    | Santa Clarita  | 148900 |
+|   44 | b174c9021e72486ad5d0 | Tom        | Smith    | Santa Barbara  | 131300 |
+|   45 | c52c2a13b88c302d5dd0 | Jeremy     | Davis    | San Mateo      |  76400 |
+|   46 | c364fea90e5fd85c4b30 | Ron        | Brown    | San Mateo      | 120700 |
+|   47 | 2d261f5dc3d54ea69f1e | John       | Davis    | Alameda        |  37900 |
+|   48 | 412e911b740923e4dc7a | David      | Smith    | San Bernardino | 120300 |
+|   49 | aa6d581aadfc986e488d | Nikita     | Jones    | Alameda        | 152100 |
+|   50 | 8221184fa89b0bc02834 | Rachel     | Williams | San Bernardino |  84500 |
+|   51 | 9e2db4632a439bfa6e70 | James      | Wilson   | San Bernardino |  41800 |
+|   52 | c08850b59a53ba4d2a7a | Nikita     | Miller   | Los Angeles    | 144600 |
+|   53 | 08c09e42f7cec3acf6b7 | Tom        | Davis    | San Mateo      | 108000 |
+|   54 | 537ca32000e5630fa431 | David      | West     | Los Angeles    | 113600 |
+|   55 | b3a8f81b176f04fba73f | John       | Williams | Santa Clarita  |  51500 |
+|   56 | efca6f9b978024afb255 | Rachel     | Davis    | San Bernardino |  40500 |
+|   57 | f2b64300f8f86c82b50e | John       | Davis    | Los Angeles    | 151800 |
+|   58 | 00440557dbe54ed72ee3 | David      | Smith    | Santa Clarita  | 126200 |
+|   59 | c671545de1481024795b | Katie      | West     | Santa Barbara  | 104900 |
+|   60 | 7809c1368ce4d5d77d2a | David      | Jones    | Santa Barbara  | 142100 |
+|   61 | 43a2c5f9e9746d19bf26 | Tom        | Brown    | Alameda        |  93900 |
+|   62 | d183b94719415fc491a3 | Rachel     | Smith    | Santa Barbara  | 102300 |
+|   63 | 50e7341085b87d5296d9 | John       | Brown    | San Bernardino | 100800 |
+|   64 | 6e7b0c4033614d239032 | Jeremy     | Brown    | Los Angeles    |  73600 |
+|   65 | b95de5fab7a3c7138557 | Nikita     | Johnson  | San Bernardino |  83600 |
+|   66 | ddffc9f64094c312effc | James      | Smith    | Santa Clara    |  38900 |
+|   67 | 7f052aefd1f72307b54d | Jeremy     | Brown    | Santa Barbara  | 123700 |
+|   68 | e1bc624ee41377003eb1 | Katie      | Wilson   | Santa Clarita  | 114600 |
+|   69 | 2303961485882d47929e | John       | Smith    | Los Angeles    | 105400 |
+|   70 | 6438e7ef8294588927c6 | John       | Brown    | San Mateo      |  98100 |
+|   71 | ce72396d88b0cf5299c3 | Nikita     | Wilson   | Santa Clarita  | 104700 |
+|   72 | cb8ffe610d5c5fa5829c | David      | Brown    | Alameda        |  78400 |
+|   73 | ac5b6321b66f4b28f31a | Nikita     | Jones    | Los Angeles    |  60100 |
+|   74 | b149f568d4874cc1d3db | James      | Davis    | Santa Clarita  | 132500 |
+|   75 | 123c0e8a1ec5523fc7a3 | Ron        | Miller   | San Mateo      | 109000 |
+|   76 | b749d5777fa9bf06ade0 | James      | West     | Santa Barbara  |  47400 |
+|   77 | 3b3da4372a84e3facdf8 | Rachel     | Williams | Alameda        |  39300 |
+|   78 | dddc628ff7ff9f933be6 | Rachel     | Smith    | Santa Clara    |  92100 |
+|   79 | bde0e56ea09e3011753d | James      | Davis    | Alameda        | 116900 |
+|   80 | 992281765f9d92261130 | Tom        | Brown    | Santa Clarita  | 133600 |
+|   81 | 03dd96184568298ca084 | James      | Williams | San Bernardino | 125400 |
+|   82 | 4807acf06e9cab1ccacf | Rachel     | Smith    | San Mateo      | 150100 |
+|   83 | bf7958bdfcd0ffeb72b9 | James      | Smith    | Los Angeles    | 145600 |
+|   84 | 5bb07bc59c6fd8ca353c | James      | Wilson   | Santa Barbara  | 145800 |
+|   85 | f684e5afd389fa2442f5 | John       | Johnson  | Alameda        |  71700 |
+|   86 | 9002180070b00b67a8d4 | James      | Davis    | San Mateo      | 116000 |
+|   87 | 6834524ca9776f5ce51d | Tom        | Williams | Santa Clara    |  54900 |
+|   88 | bc193f93c2d7c083bd8d | Katie      | Johnson  | Santa Barbara  | 108200 |
+|   89 | ed2576eea615194798ff | James      | West     | Los Angeles    | 111100 |
+|   90 | 28e1700f86ce111996a7 | Nikita     | Jones    | San Mateo      |  47000 |
+|   91 | 766b1bc787bfb6e277ca | Rachel     | Williams | Alameda        |  52300 |
+|   92 | e19a2cfd90a5ada984db | Tom        | West     | Los Angeles    |  76000 |
+|   93 | ccd771edd387de605864 | Nikita     | Miller   | San Bernardino |  76600 |
+|   94 | 9b4579b180593a00d3d9 | James      | Smith    | Santa Clarita  |  86700 |
+|   95 | 4298969da6e071f1b5f0 | James      | Jones    | Los Angeles    |  49600 |
+|   96 | cbc4d8cc197165162ace | David      | Davis    | Los Angeles    |  41700 |
+|   97 | 0f01c33e1a397f605835 | Jeremy     | Johnson  | Santa Clara    | 132200 |
+|   98 | 09720db71ef620cd19fc | Jeremy     | Smith    | San Bernardino | 142000 |
+|   99 | 84763faa82234753fbad | Ron        | Davis    | Santa Clarita  | 142100 |
+|  100 | 5d896cd870e14593b193 | Rachel     | West     | Santa Clara    |  54100 |
++------+----------------------+------------+----------+----------------+--------+
+100 rows in set (0,01 sec)
+
+
+
+
+
+2) SQL-скрипт который выводит название книги и ее авторов для жанра “Фантастика”
+
+SELECT название, автор
+FROM Книги
+WHERE Книги.жанр=‘фантастика’;
+
+
+
+
+3)SQL-скрипт который выводит автора, который написал больше всего книг
+
+SELECT автор , count(DISTINCT название) Qty
+FROM Книги
+GROUP BY автор
+HAVING COUNT(DISTINCT название)) > = ALL
+(SELECT COUNT(DISTINCT название)) 
+FROM Книги
+GROUP BY автор)
+
+
+
